@@ -13,6 +13,7 @@
   const FLIP_MS = 450; // must match the .mem-inner transition in style.css
   const SWAP_MS = 650; // time for one swap
   const SHOW_WRONG_MS = 1500; // how long a wrong card stays face up
+  const NEXT_MS = 1600; // shortest wait after a right card; the praise is always heard in full
   const IDLE_MS = 8000; // idle time before the word is said again (no other hint)
   const CONFETTI = ["🎃", "🦇", "👻", "⭐", "🍬", "✨"];
 
@@ -81,14 +82,17 @@
         `<span class="mem-face mem-front">${ch.svg}<span class="mem-word">${ch.word}</span></span>` +
         `<span class="mem-face mem-back" aria-hidden="true"><span class="mem-q">?</span></span>` +
         `</span>`;
-      // pointerdown feels instant on touch; click with detail 0 = keyboard
+      // While playing, pointerdown feels instant on touch. Before Play, cards speak on
+      // click: on touch screens pointerdown doesn't unlock audio (iOS/Android rule), and
+      // tapping a card is often the very first thing a child does. Click with detail 0 = keyboard.
       card.addEventListener("pointerdown", (e) => {
+        if (state.mode !== "game") return;
         if (e.pointerType === "mouse" && e.button !== 0) return;
         e.preventDefault();
         onCard(card);
       });
       card.addEventListener("click", (e) => {
-        if (e.detail === 0) onCard(card);
+        if (state.mode === "start" || e.detail === 0) onCard(card);
       });
       els.cards.appendChild(card);
     });
@@ -208,10 +212,8 @@
         Kit.renderProgress(els.progress, CHARACTERS.length, state.found);
       }, FLIP_MS);
       later(() => card.classList.add("gone"), FLIP_MS + 1300);
-      later(() => {
-        if (state.remaining.length) ask();
-        else endGame();
-      }, FLIP_MS + 2000);
+      // next turn once the praise has been said (and at least NEXT_MS after the tap)
+      later(() => Kit.afterSpeech(nextTurn), FLIP_MS + NEXT_MS);
     } else {
       // show which card it was and say its name, then turn it back over;
       // the next turn asks for a different card
@@ -221,8 +223,14 @@
         Kit.speak(card.dataset.word);
       }, FLIP_MS);
       later(() => flip(card, true), FLIP_MS + SHOW_WRONG_MS);
-      later(ask, FLIP_MS * 2 + SHOW_WRONG_MS);
+      later(() => Kit.afterSpeech(nextTurn, 0), FLIP_MS * 2 + SHOW_WRONG_MS);
     }
+  }
+
+  function nextTurn() {
+    if (state.mode !== "game") return; // left the game meanwhile
+    if (state.remaining.length) ask();
+    else endGame();
   }
 
   function endGame() {

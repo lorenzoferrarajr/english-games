@@ -112,6 +112,11 @@ window.Kit = (function () {
   if (synth) synth.getVoices();
 
   let hasSpoken = false; // has speak() been called at least once?
+  // iOS only plays speech after something was spoken inside a real tap (click, keydown).
+  // A speak() from pointerdown, or one delayed by a timer, doesn't count.
+  let speechUnlocked = false;
+  let inGesture = false; // inside a click/keydown right now
+  let spokeInGesture = false; // synth.speak() was called during this click/keydown
 
   // A short "space" before each word. Tablets put their audio output to sleep after
   // some silence, and the first part of a word can be lost while it wakes up. So we
@@ -149,6 +154,7 @@ window.Kit = (function () {
     hasSpoken = true;
     if (lead) wakeOutput();
     const run = () => {
+      pendingSpeech = 0;
       if (quiet()) return; // muted or info panel opened while waiting
       const voice = chooseVoice(options.voice);
       const rate = window.Settings ? Settings.getRate(options.speed) : NORMAL_RATE;
@@ -160,6 +166,7 @@ window.Kit = (function () {
         u.pitch = 1.1;
         synth.speak(u);
       });
+      if (inGesture) spokeInGesture = true;
     };
     if (synth.paused) synth.resume();
     if (synth.speaking || synth.pending) {
@@ -171,6 +178,21 @@ window.Kit = (function () {
     } else {
       run();
     }
+  }
+
+  // Run fn once nothing is being said any more (a word waiting for its "space" counts
+  // as being said), after a short pause. Use it to start the next question, so it never
+  // cuts off praise like "Pumpkin! Brilliant!", whatever the speed. Muted = no waiting.
+  // Gives up waiting after maxMs, in case a browser never reports the end of speech.
+  function afterSpeech(fn, pauseMs = 400, maxMs = 8000) {
+    const start = Date.now();
+    const talking = () =>
+      synth && !quiet() && (pendingSpeech || synth.speaking || synth.pending);
+    const check = () => {
+      if (talking() && Date.now() - start < maxMs) setTimeout(check, 100);
+      else setTimeout(fn, pauseMs);
+    };
+    check();
   }
 
   // ---------- Sound effects (Web Audio, no files needed) ----------
@@ -237,19 +259,30 @@ window.Kit = (function () {
   );
 
   // Speech: iOS only allows speech once something has been spoken inside a gesture.
-  // This runs in the bubble phase, AFTER the game's own click handlers: if the game
-  // already spoke during this click, that unlocked speech; if not, speak a silent
-  // utterance now. (Doing it before the game's handler would make the game cancel it
-  // straight away, which Safari doesn't handle well.)
+  // markGesture runs first (capture phase), unlockSpeech last (bubble phase on window),
+  // AFTER the game's own click handlers: if the game spoke during this click, that
+  // unlocked speech; if not (nothing said, a pointerdown speak, or a word waiting for
+  // its "space"), speak a silent utterance now. (Doing it before the game's handler would
+  // make the game cancel it straight away, which Safari doesn't handle well.)
+  function markGesture() {
+    inGesture = true;
+    spokeInGesture = false;
+  }
   function unlockSpeech() {
-    if (!synth || hasSpoken) return;
+    inGesture = false;
+    if (!synth || speechUnlocked) return;
+    speechUnlocked = true;
+    if (spokeInGesture) return;
     hasSpoken = true;
     const u = new SpeechSynthesisUtterance(" ");
     u.lang = LANG;
     u.volume = 0;
     synth.speak(u);
   }
-  ["click", "keydown"].forEach((type) => document.addEventListener(type, unlockSpeech));
+  ["click", "keydown"].forEach((type) => {
+    window.addEventListener(type, markGesture, true);
+    window.addEventListener(type, unlockSpeech);
+  });
 
   // ---------- Mute (remembered across all games) ----------
   function setupMute(button) {
@@ -373,6 +406,7 @@ window.Kit = (function () {
     save,
     speak,
     speakWith,
+    afterSpeech,
     sfx,
     setupMute,
     show,
