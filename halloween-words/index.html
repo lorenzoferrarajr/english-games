@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Halloween Words</title>
+  <link rel="stylesheet" href="../shared/base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-screen="start">
+  <!-- Night sky background: moon, stars and hills -->
+  <div class="sky" aria-hidden="true">
+    <div class="moon"></div>
+    <div class="hills"></div>
+  </div>
+
+  <header class="topbar">
+    <a class="icon-btn" href="../index.html" aria-label="All games">🏠</a>
+    <div id="progress" class="progress" aria-hidden="true"></div>
+    <button id="mute" class="icon-btn" type="button" aria-label="Mute" aria-pressed="false">🔊</button>
+  </header>
+
+  <main>
+    <!-- Learn screen: tap a character to hear its name -->
+    <section id="screen-start" class="screen active">
+      <h1 class="title">Halloween!</h1>
+      <div id="learn-cards" class="chars learn"></div>
+      <button id="play" class="big-btn pulse" type="button" aria-label="Play">▶</button>
+    </section>
+
+    <!-- Game screen: listen and tap the right character -->
+    <section id="screen-game" class="screen">
+      <div class="prompt">
+        <button id="listen" class="listen" type="button" aria-label="Listen again">🔊</button>
+        <div id="bubble" class="bubble" aria-live="polite"></div>
+      </div>
+      <div id="choices" class="chars"></div>
+    </section>
+
+    <!-- End screen -->
+    <section id="screen-end" class="screen">
+      <div id="end-pumpkin" class="trophy end-pumpkin" aria-hidden="true"></div>
+      <h2 class="well-done">Happy Halloween!</h2>
+      <div id="end-stars" class="end-stars" aria-hidden="true"></div>
+      <div class="end-buttons">
+        <button id="learn" class="small-btn" type="button" aria-label="Back to the pictures">👻</button>
+        <button id="again" class="big-btn" type="button" aria-label="Play again">▶</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="celebrate" class="celebrate" aria-hidden="true"></div>
+
+  <script src="../shared/kit.js"></script>
+  <script src="characters.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

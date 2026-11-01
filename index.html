@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>English Games</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: calc(24px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+      background: linear-gradient(180deg, #fff4d6, #ffe0ec);
+      color: #3b3a5c;
+      font-family: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Trebuchet MS", system-ui, sans-serif;
+      text-align: center;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+    h1 { margin: 0 0 32px; font-size: clamp(36px, 7vmin, 64px); }
+    .games {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .game {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 24px 16px;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
+      color: inherit;
+      text-decoration: none;
+      transition: transform 0.08s;
+    }
+    .game:active { transform: translateY(5px); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1); }
+    .icon { font-size: 80px; line-height: 1; }
+    .name { font-size: 30px; font-weight: bold; }
+    .what { font-size: 20px; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <h1>English Games</h1>
+  <nav class="games">
+    <a class="game" href="number-words/index.html">
+      <span class="icon" aria-hidden="true">🔢</span>
+      <span class="name">Number Words</span>
+      <span class="what">1 2 3 → one two three</span>
+    </a>
+    <a class="game" href="count-and-match/index.html">
+      <span class="icon" aria-hidden="true">🍎</span>
+      <span class="name">Count and Match</span>
+      <span class="what">three ↔ 🍎🍎🍎</span>
+    </a>
+    <a class="game" href="halloween-words/index.html">
+      <span class="icon" aria-hidden="true">🎃</span>
+      <span class="name">Halloween</span>
+      <span class="what">ghost, bat, witch…</span>
+    </a>
+  </nav>
+</body>
+</html>

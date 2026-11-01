@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Audio Check</title>
+  <link rel="stylesheet" href="base.css">
+  <style>
+    /* A page for grown-ups: checks speech and sound effects on a device. Not linked from the launcher. */
+    body { overflow: auto; height: auto; min-height: 100dvh; padding: 24px 16px; font-family: system-ui, sans-serif; }
+    h1 { margin: 0 0 8px; }
+    p { max-width: 640px; line-height: 1.4; }
+    .row { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0; }
+    .row button { padding: 16px 20px; border-radius: 16px; background: var(--card); box-shadow: 0 4px 0 rgba(0,0,0,0.12); font-size: 18px; font-family: inherit; }
+    .row button:active { transform: translateY(3px); }
+    pre { max-width: 100%; white-space: pre-wrap; background: var(--card); padding: 12px; border-radius: 12px; font-size: 14px; }
+    #voices button { font-size: 15px; padding: 10px 14px; }
+  </style>
+</head>
+<body>
+  <h1>Audio check</h1>
+  <p>Tap the buttons and listen. If nothing is heard: turn the volume up, and check the iPad is not in silent mode (side switch, or the bell in Control Center).</p>
+
+  <div class="row">
+    <button id="game-voice" type="button">🗣️ Game voice: "ghost, bat, pumpkin"</button>
+    <button id="beep" type="button">🔔 Sound effect</button>
+    <button id="plain" type="button">🗣️ Plain speech (no voice chosen)</button>
+  </div>
+
+  <pre id="info">Tap a button…</pre>
+
+  <h2>English voices on this device</h2>
+  <p>Tap one to hear it. The game uses the one shown above as "voice".</p>
+  <div id="voices" class="row"></div>
+
+  <script src="kit.js"></script>
+  <script>
+    (function () {
+      "use strict";
+      const info = document.getElementById("info");
+      const log = [];
+
+      function report(msg) {
+        if (msg) log.unshift(new Date().toLocaleTimeString() + "  " + msg);
+        const s = window.speechSynthesis;
+        const d = Kit.debugInfo();
+        info.textContent = [
+          "speechSynthesis: " + (s ? "yes" : "NOT SUPPORTED"),
+          "voice: " + d.voice,
+          "sound effects (AudioContext): " + d.sounds,
+          "silent-mode override (audioSession): " + (navigator.audioSession ? navigator.audioSession.type : "not supported"),
+          "muted in games: " + d.muted,
+          "",
+          ...log.slice(0, 12),
+        ].join("\n");
+      }
+
+      function watch(u, label) {
+        u.onstart = () => report(label + ": started");
+        u.onend = () => report(label + ": finished");
+        u.onerror = (e) => report(label + ": ERROR " + (e.error || ""));
+      }
+
+      document.getElementById("game-voice").addEventListener("click", () => {
+        Kit.speak("ghost, bat, pumpkin");
+        report("game voice: asked to speak");
+      });
+
+      document.getElementById("beep").addEventListener("click", () => {
+        Kit.sfx.success();
+        setTimeout(() => report("sound effect played"), 50);
+      });
+
+      document.getElementById("plain").addEventListener("click", () => {
+        const u = new SpeechSynthesisUtterance("Hello! Happy Halloween!");
+        u.lang = "en-GB";
+        watch(u, "plain speech");
+        speechSynthesis.speak(u);
+      });
+
+      function listVoices() {
+        const box = document.getElementById("voices");
+        box.innerHTML = "";
+        speechSynthesis.getVoices()
+          .filter((v) => (v.lang || "").toLowerCase().startsWith("en"))
+          .forEach((v) => {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.textContent = v.name + " · " + v.lang;
+            b.addEventListener("click", () => {
+              const u = new SpeechSynthesisUtterance("one, two, three, ghost");
+              u.voice = v;
+              u.lang = v.lang;
+              watch(u, v.name);
+              speechSynthesis.speak(u);
+            });
+            box.appendChild(b);
+          });
+        if (!box.children.length) box.textContent = "(no English voices listed yet)";
+      }
+
+      if (window.speechSynthesis) {
+        listVoices();
+        speechSynthesis.addEventListener("voiceschanged", listVoices);
+      }
+      report();
+    })();
+  </script>
+</body>
+</html>

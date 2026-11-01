@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Count and Match</title>
+  <link rel="stylesheet" href="../shared/base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-screen="start">
+  <header class="topbar">
+    <a class="icon-btn" href="../index.html" aria-label="All games">🏠</a>
+    <div id="progress" class="progress" aria-hidden="true"></div>
+    <button id="mute" class="icon-btn" type="button" aria-label="Mute" aria-pressed="false">🔊</button>
+  </header>
+
+  <main>
+    <!-- Start screen: a small animated example of a connection -->
+    <section id="screen-start" class="screen active">
+      <h1 class="title">Count and Match</h1>
+      <div class="demo" aria-hidden="true">
+        <div class="mcard word-card demo-card">two</div>
+        <div class="demo-line"><span class="demo-finger">👆</span></div>
+        <div class="mcard set-card demo-card"><span class="set"><span>🐥</span><span>🐥</span></span></div>
+      </div>
+      <button id="play" class="big-btn pulse" type="button" aria-label="Play">▶</button>
+    </section>
+
+    <!-- Game screen: connect each word to the card with that many things -->
+    <section id="screen-game" class="screen">
+      <div id="board" class="board">
+        <div id="words" class="col words"></div>
+        <div id="sets" class="col sets"></div>
+        <svg id="lines" class="lines" aria-hidden="true"></svg>
+      </div>
+    </section>
+
+    <!-- End screen -->
+    <section id="screen-end" class="screen">
+      <div class="trophy" aria-hidden="true">🏆</div>
+      <h2 class="well-done">Well done!</h2>
+      <div id="end-stars" class="end-stars" aria-hidden="true"></div>
+      <div class="end-buttons">
+        <button id="again" class="big-btn" type="button" aria-label="Play again">▶</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="celebrate" class="celebrate" aria-hidden="true"></div>
+
+  <script src="../shared/kit.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -13,7 +13,10 @@ Each game lives in its own folder at the repository root:
 ```
 english-games/
 ├── AGENTS.md
-├── index.html            # Optional launcher page linking to every game
+├── index.html            # Launcher page linking to every game
+├── shared/
+│   ├── base.css          # Common look: colours, top bar, buttons, end screen, animations, touch CSS
+│   └── kit.js            # window.Kit: speech, sound effects, mute, screens, progress dots, celebrations
 └── <game-name>/          # kebab-case, e.g. animal-sounds, color-match
     ├── index.html        # Entry point; must open and work on its own
     ├── style.css         # Optional
@@ -24,14 +27,15 @@ english-games/
 Rules:
 - Folder names are lowercase `kebab-case` and describe the game (`fruit-memory`, `count-the-stars`).
 - Every game folder has an `index.html` entry point.
-- Games are independent: no game imports files from another game's folder. If shared code becomes worthwhile, put it in a top-level `shared/` folder and reference it with relative paths.
+- Games are independent: no game imports files from another game's folder. Common code lives in `shared/` and is loaded with relative paths (`../shared/base.css` before the game's `style.css`, `../shared/kit.js` before the game's `game.js`).
+- Use `Kit` for speech, sound effects, mute, screens, progress and celebrations instead of re-implementing them, so all games look, sound and behave the same. Only add to `shared/` what at least two games need, and when changing it, re-test every game.
 - When adding a game, add a link to it in the root `index.html` launcher (create it if missing).
 
 ## Technical constraints
 
 - **Plain HTML, CSS and JavaScript only.** No frameworks, no bundlers, no build step, no `npm install`. A game must work by opening its `index.html` in a browser.
 - Prefer working from `file://`. Avoid ES module imports and `fetch()` of local files, which are blocked from `file://` in most browsers; use classic `<script src="...">` tags and keep word lists as JS arrays/objects instead of JSON files.
-- No external network dependencies at runtime (no CDNs, remote fonts, analytics or trackers). Everything needed ships in the game folder.
+- No external network dependencies at runtime (no CDNs, remote fonts, analytics or trackers). Everything needed ships in the repository.
 - No accounts, logins, ads, in-app purchases, or collection of personal data. `localStorage` is fine for things like stars earned or a mute setting.
 - Use relative paths for all assets.
 
@@ -60,7 +64,13 @@ Rules:
 
 ### Audio on iOS and Android
 - Audio and speech only work after a user gesture: call `speechSynthesis.speak()` / `audio.play()` for the first time **inside the tap handler** of the start button.
-- `speechSynthesis.getVoices()` may be empty at first; listen for `voiceschanged` and fall back to the default voice if no English voice is found. Always set `utterance.lang` (e.g. `"en-GB"`).
+- On touch screens `pointerdown` does **not** count as a user gesture for unlocking audio; unlock (create/resume the `AudioContext`, speak a first utterance) from `click` or `touchend`. After that, sounds can play from any handler.
+- All of this is handled by `Kit.speak()` / `Kit.sfx` in `shared/kit.js`; use them rather than calling the APIs directly. Known Safari pitfalls it works around:
+  - Don't call `speechSynthesis.cancel()` and then `speak()` straight away: Safari drops the new utterance. Only cancel when something is actually speaking, and speak again after a short delay.
+  - Don't pick "the first en-GB voice": iOS lists novelty voices that can sound odd or stay silent. Choose a known voice by name, or only set `utterance.lang` and let the device pick.
+  - Silent mode mutes web audio on iPad; `navigator.audioSession.type = "playback"` (Safari 17+) lets it play.
+- To check audio on a new device, open `shared/audio-check.html` on it.
+- `speechSynthesis.getVoices()` may be empty at first; listen for `voiceschanged`. Always set `utterance.lang` (e.g. `"en-GB"`).
 - Don't assume a device has a particular voice installed; recorded audio files are the most reliable option when quality matters.
 - Remember the iPad silent switch / volume may be off: a visual cue should accompany every sound.
 

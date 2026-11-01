@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Number Words</title>
+  <link rel="stylesheet" href="../shared/base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-screen="start">
+  <header class="topbar">
+    <a class="icon-btn" href="../index.html" aria-label="All games">🏠</a>
+    <div id="progress" class="progress" aria-hidden="true"></div>
+    <button id="mute" class="icon-btn" type="button" aria-label="Mute" aria-pressed="false">🔊</button>
+  </header>
+
+  <main>
+    <!-- Learn screen: tap a card to hear the number, then press play -->
+    <section id="screen-start" class="screen active">
+      <h1 class="title">1 2 3 <span>one two three</span></h1>
+      <div id="cards" class="cards"></div>
+      <button id="play" class="big-btn pulse" type="button" aria-label="Play">▶</button>
+    </section>
+
+    <!-- Game screen: build the number word from letter tiles -->
+    <section id="screen-game" class="screen">
+      <div class="clue">
+        <button id="numeral" class="numeral" type="button" aria-label="Hear the number">
+          <span id="numeral-text"></span>
+          <span class="speaker" aria-hidden="true">🔊</span>
+        </button>
+        <div id="objects" class="objects" aria-hidden="true"></div>
+      </div>
+      <div id="slots" class="slots" aria-hidden="true"></div>
+      <div id="tiles" class="tiles"></div>
+    </section>
+
+    <!-- End screen -->
+    <section id="screen-end" class="screen">
+      <div class="trophy" aria-hidden="true">🏆</div>
+      <h2 class="well-done">Well done!</h2>
+      <div id="end-stars" class="end-stars" aria-hidden="true"></div>
+      <div class="end-buttons">
+        <button id="learn" class="small-btn" type="button" aria-label="Back to the numbers">1 2 3</button>
+        <button id="again" class="big-btn" type="button" aria-label="Play again">▶</button>
+      </div>
+    </section>
+  </main>
+
+  <div id="celebrate" class="celebrate" aria-hidden="true"></div>
+
+  <script src="../shared/kit.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

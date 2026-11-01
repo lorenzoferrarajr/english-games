@@ -1,0 +1,188 @@
+/* Number Words: game-specific styles (shared look is in ../shared/base.css) */
+
+:root {
+  --tile: #ffd84d;
+  --tile-shadow: #d9a400;
+}
+
+/* ---------- Learn screen ---------- */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(10px, 2vmin, 20px);
+  width: min(100%, 900px);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 64px;
+  padding: clamp(8px, 1.6vmin, 16px) 4px;
+  border-radius: 22px;
+  background: var(--card);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.1);
+  transition: transform 0.08s;
+}
+
+.card:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-num {
+  font-size: clamp(44px, 9vmin, 84px);
+  font-weight: bold;
+  line-height: 1;
+  color: var(--c);
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-word {
+  font-size: clamp(24px, 4.4vmin, 40px);
+}
+
+/* ---------- Game screen ---------- */
+
+.clue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 4vmin, 48px);
+  width: 100%;
+}
+
+.numeral {
+  position: relative;
+  min-width: clamp(130px, 24vmin, 210px);
+  height: clamp(130px, 24vmin, 210px);
+  padding: 0 16px;
+  border-radius: 32px;
+  background: var(--card);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.1);
+  color: var(--c);
+  font-size: clamp(96px, 19vmin, 170px);
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+  transition: transform 0.08s;
+}
+
+.numeral:active {
+  transform: translateY(4px);
+}
+
+.numeral.speaking {
+  animation: pop 0.5s ease-out;
+}
+
+.speaker {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
+  font-size: 24px;
+  text-shadow: none;
+}
+
+.objects {
+  --size: clamp(40px, 8vmin, 72px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: calc(var(--size) * 5 + 6px * 4);
+  font-size: calc(var(--size) * 0.85);
+}
+
+.obj {
+  width: var(--size);
+  height: var(--size);
+  display: grid;
+  place-items: center;
+  animation: drop 0.4s ease-out backwards;
+}
+
+.slots {
+  display: flex;
+  gap: clamp(8px, 1.6vmin, 14px);
+}
+
+.slot {
+  width: clamp(64px, 12vmin, 104px);
+  height: clamp(80px, 15vmin, 124px);
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  border: 4px dashed var(--ghost);
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--ghost);
+  font-size: clamp(52px, 10vmin, 88px);
+  line-height: 1;
+}
+
+.slot.next {
+  border-color: var(--accent);
+  border-style: solid;
+}
+
+.slot.filled {
+  border: 4px solid transparent;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+}
+
+.slots.done .slot {
+  color: var(--go-shadow);
+  animation: pop 0.5s ease-out;
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(12px, 2.4vmin, 22px);
+  min-height: clamp(76px, 13vmin, 112px);
+}
+
+.tile {
+  width: clamp(76px, 13vmin, 112px);
+  height: clamp(76px, 13vmin, 112px);
+  border-radius: 20px;
+  background: var(--tile);
+  box-shadow: 0 7px 0 var(--tile-shadow);
+  font-size: clamp(52px, 10vmin, 88px);
+  line-height: 1;
+  touch-action: none;
+  transition: transform 0.08s, opacity 0.2s;
+}
+
+.tile:active {
+  transform: translateY(5px);
+  box-shadow: 0 2px 0 var(--tile-shadow);
+}
+
+.tile.used {
+  opacity: 0;
+  transform: scale(0.4);
+  pointer-events: none;
+}
+
+.tile.hint {
+  animation: tile-glow 1s ease-in-out infinite;
+}
+
+@keyframes tile-glow {
+  0%, 100% { box-shadow: 0 7px 0 var(--tile-shadow), 0 0 0 0 var(--hint); }
+  50% { box-shadow: 0 7px 0 var(--tile-shadow), 0 0 0 10px var(--hint); }
+}

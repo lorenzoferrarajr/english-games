@@ -1,0 +1,271 @@
+/* Shared look and touch behaviour for all games.
+   Load it before the game's own stylesheet:  <link rel="stylesheet" href="../shared/base.css"> */
+
+:root {
+  --bg-top: #fff4d6;
+  --bg-bottom: #ffe0ec;
+  --ink: #3b3a5c;
+  --card: #ffffff;
+  --ghost: #d8d2e6;
+  --accent: #ff8a3d;
+  --go: #2fbf68;
+  --go-shadow: #1f9450;
+  --hint: #3d9bff;
+  --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Trebuchet MS", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+  color: var(--ink);
+  font-family: var(--font);
+  /* Touch: no double-tap zoom, no selection, no callouts, no pull-to-refresh */
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  border: 0;
+  cursor: pointer;
+}
+
+/* ---------- Top bar ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+}
+
+.icon-btn {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+  font-size: 32px;
+  text-decoration: none;
+  transition: transform 0.08s;
+}
+
+.icon-btn:active {
+  transform: translateY(3px) scale(0.95);
+}
+
+.progress {
+  display: flex;
+  gap: 8px;
+}
+
+body:not([data-screen="game"]) .progress {
+  visibility: hidden;
+}
+
+.dot {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  border: 3px solid rgba(59, 58, 92, 0.15);
+  font-size: 24px;
+}
+
+.dot.current {
+  border-color: var(--accent);
+}
+
+.dot.done {
+  background: transparent;
+  border-color: transparent;
+  animation: pop 0.4s ease-out;
+}
+
+/* ---------- Screens ---------- */
+
+main {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.screen {
+  display: none;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 0 16px 16px;
+}
+
+.screen.active {
+  display: flex;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(32px, 6vmin, 56px);
+  text-align: center;
+}
+
+.title span {
+  display: block;
+  font-size: 0.55em;
+  opacity: 0.7;
+}
+
+/* ---------- Buttons ---------- */
+
+.big-btn {
+  width: clamp(110px, 18vmin, 150px);
+  height: clamp(110px, 18vmin, 150px);
+  flex: none;
+  border-radius: 50%;
+  background: var(--go);
+  box-shadow: 0 8px 0 var(--go-shadow);
+  color: #fff;
+  font-size: clamp(48px, 8vmin, 68px);
+  padding-left: 0.15em; /* optically centre the ▶ */
+  transition: transform 0.08s;
+}
+
+.big-btn:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 var(--go-shadow);
+}
+
+.small-btn {
+  min-width: 120px;
+  height: 80px;
+  padding: 0 20px;
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
+  font-size: 36px;
+  font-weight: bold;
+  transition: transform 0.08s;
+}
+
+.small-btn:active {
+  transform: translateY(4px);
+}
+
+.pulse {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* ---------- End screen ---------- */
+
+.trophy {
+  font-size: clamp(100px, 22vmin, 180px);
+  line-height: 1;
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.well-done {
+  margin: 0;
+  font-size: clamp(44px, 9vmin, 80px);
+}
+
+.end-stars {
+  font-size: clamp(32px, 6vmin, 52px);
+  letter-spacing: 4px;
+  text-align: center;
+}
+
+.end-buttons {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+/* ---------- Celebration ---------- */
+
+.celebrate {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.burst {
+  position: absolute;
+  bottom: -80px;
+  animation: rise 1.6s ease-out forwards;
+}
+
+.bounce {
+  animation: pop 0.4s ease-out;
+}
+
+.wobble {
+  animation: wobble 0.45s ease-in-out;
+}
+
+/* ---------- Animations ---------- */
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-16px); }
+}
+
+@keyframes drop {
+  from { transform: translateY(-30px) scale(0.5); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+
+@keyframes rise {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  100% { transform: translate(var(--dx), -75vh) rotate(var(--rot)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
