@@ -34,6 +34,7 @@ body {
   background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
   color: var(--ink);
   font-family: var(--font);
+  text-transform: uppercase; /* capital block letters (default; see letter case below) */
   /* Touch: no double-tap zoom, no selection, no callouts, no pull-to-refresh */
   touch-action: manipulation;
   user-select: none;
@@ -43,8 +44,14 @@ body {
   overscroll-behavior: none;
 }
 
+/* Letter case is chosen on the games index page (shared/settings.js) */
+html[data-letter-case="lower"] body {
+  text-transform: lowercase;
+}
+
 button {
   font-family: inherit;
+  text-transform: inherit;
   color: inherit;
   border: 0;
   cursor: pointer;

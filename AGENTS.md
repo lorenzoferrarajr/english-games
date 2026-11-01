@@ -13,10 +13,14 @@ Each game lives in its own folder at the repository root:
 ```
 english-games/
 ├── AGENTS.md
-├── index.html            # Launcher page linking to every game
+├── index.html            # Launcher page linking to every game, plus settings
+├── serve.py              # Local server with caching off, for testing on tablets
 ├── shared/
 │   ├── base.css          # Common look: colours, top bar, buttons, end screen, animations, touch CSS
-│   └── kit.js            # window.Kit: speech, sound effects, mute, screens, progress dots, celebrations
+│   ├── kit.js            # window.Kit: speech, sound effects, mute, screens, progress dots, celebrations
+│   ├── settings.js       # window.Settings: options chosen on the index page (e.g. UPPERCASE / lowercase letters)
+│   ├── audio-check.html  # Page to check speech and sounds on a device
+│   └── halloween/        # Shared by the Halloween games: characters.js (words + SVG drawings), theme.css (night sky)
 └── <game-name>/          # kebab-case, e.g. animal-sounds, color-match
     ├── index.html        # Entry point; must open and work on its own
     ├── style.css         # Optional
@@ -28,6 +32,8 @@ Rules:
 - Folder names are lowercase `kebab-case` and describe the game (`fruit-memory`, `count-the-stars`).
 - Every game folder has an `index.html` entry point.
 - Games are independent: no game imports files from another game's folder. Common code lives in `shared/` and is loaded with relative paths (`../shared/base.css` before the game's `style.css`, `../shared/kit.js` before the game's `game.js`).
+- Every page loads `../shared/settings.js` in `<head>`, before the stylesheets, so settings chosen on the index page (like letter case) apply to it.
+- All text is shown in UPPERCASE or lowercase depending on that setting (CSS `text-transform` in `shared/base.css`). Write words in lowercase in the code, never hard-code capitals for case, and make sure the longest word fits in capitals.
 - Use `Kit` for speech, sound effects, mute, screens, progress and celebrations instead of re-implementing them, so all games look, sound and behave the same. Only add to `shared/` what at least two games need, and when changing it, re-test every game.
 - When adding a game, add a link to it in the root `index.html` launcher (create it if missing).
 
@@ -122,9 +128,9 @@ The players are 6 years old, are still learning to read (in any language), and d
 ## Testing a game
 
 There is no automated test suite. Before considering a game done:
-1. Open `<game-name>/index.html` directly in a browser (and/or serve the repo with `python3 -m http.server` and open `http://localhost:8000/<game-name>/`).
+1. Serve the repo with `python3 serve.py` (like `python3 -m http.server`, but with browser caching turned off) and open `http://localhost:8000/<game-name>/`. Opening `<game-name>/index.html` directly also works for a quick look.
 2. Play through a full round with the mouse, then with touch emulation in the browser dev tools at tablet sizes (e.g. iPad 1024×768 / 820×1180 and a typical Android tablet 1280×800), in landscape and portrait.
-3. Whenever possible, test on a **real iPad and a real Android tablet** (serve with `python3 -m http.server` and open `http://<computer-ip>:8000/<game-name>/` on the same Wi-Fi). Emulation doesn't catch audio, speech and touch quirks.
+3. Whenever possible, test on a **real iPad and a real Android tablet** (run `python3 serve.py` and open the tablet address it prints, on the same Wi-Fi). Always use `serve.py` for this: with a plain server, Safari on iPad keeps old copies of the files and shows stale versions. Emulation doesn't catch audio, speech and touch quirks.
 4. Check that every word is spoken, the mute button works, wrong answers can be retried, and the end screen and "Play again" work.
 5. Check there is no accidental zoom, scroll, text selection or pull-to-refresh while playing.
 6. Check the browser console has no errors.

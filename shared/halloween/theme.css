@@ -1,0 +1,151 @@
+/* Halloween night theme, shared by the Halloween games.
+   Load after ../shared/base.css:  <link rel="stylesheet" href="../shared/halloween/theme.css">
+   Pages also need the sky markup:
+   <div class="sky" aria-hidden="true"><div class="moon"></div><div class="hills"></div></div> */
+
+/* Night theme: override the shared colours */
+:root {
+  --bg-top: #150e36;
+  --bg-bottom: #3d2266;
+  --ink: #fff4e0;
+  --card: #4a3577;
+  --card-light: #5c4590;
+  --accent: #ff8c1a;
+  --hint: #ffd84d;
+}
+
+.topbar,
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Sky ---------- */
+
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(2px 2px at 12% 18%, #fff 50%, transparent 51%),
+    radial-gradient(2px 2px at 28% 8%, #fff 50%, transparent 51%),
+    radial-gradient(3px 3px at 46% 22%, #fff8 50%, transparent 51%),
+    radial-gradient(2px 2px at 63% 12%, #fff 50%, transparent 51%),
+    radial-gradient(2px 2px at 8% 45%, #fff8 50%, transparent 51%),
+    radial-gradient(3px 3px at 90% 40%, #fff 50%, transparent 51%),
+    radial-gradient(2px 2px at 36% 38%, #fff8 50%, transparent 51%),
+    radial-gradient(2px 2px at 72% 30%, #fff 50%, transparent 51%);
+}
+
+.moon {
+  position: absolute;
+  top: 90px;
+  right: 6%;
+  width: clamp(70px, 12vmin, 120px);
+  height: clamp(70px, 12vmin, 120px);
+  border-radius: 50%;
+  background: #fff3c4;
+  box-shadow: 0 0 40px 12px rgba(255, 243, 196, 0.35);
+  opacity: 0.9;
+}
+
+.hills {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -8vh;
+  height: 26vh;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  background: #1c1238;
+}
+
+/* Progress dots on the dark sky (small, so up to 16 fit) */
+.dot {
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.progress {
+  gap: 6px;
+}
+
+.title {
+  color: var(--accent);
+  text-shadow: 0 4px 0 #6b2f00;
+}
+/* ---------- Prompt: listen button and word bubble ---------- */
+
+.prompt {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.listen {
+  width: clamp(84px, 14vmin, 112px);
+  height: clamp(84px, 14vmin, 112px);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 7px 0 #b85a00;
+  font-size: clamp(40px, 7vmin, 56px);
+  transition: transform 0.08s;
+}
+
+.listen:active {
+  transform: translateY(5px);
+  box-shadow: 0 2px 0 #b85a00;
+}
+
+.listen.speaking {
+  animation: pop 0.5s ease-out;
+}
+
+.bubble {
+  min-width: 180px;
+  padding: 10px 28px;
+  border-radius: 28px;
+  background: #fff4e0;
+  color: #3b2766;
+  font-size: clamp(40px, 7.5vmin, 64px);
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* ---------- End screen ---------- */
+
+.end-pumpkin {
+  width: clamp(110px, 22vmin, 180px);
+}
+
+.small-btn svg {
+  width: 56px;
+  height: 56px;
+  vertical-align: middle;
+}
+
+.end-pumpkin svg {
+  width: 100%;
+  height: auto;
+}
+/* ---------- Animations ---------- */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes appear {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes happy {
+  0% { transform: scale(1) rotate(0); }
+  30% { transform: scale(1.15) rotate(-6deg); }
+  60% { transform: scale(1.15) rotate(6deg); }
+  100% { transform: scale(1) rotate(0); }
+}

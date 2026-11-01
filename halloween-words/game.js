@@ -1,5 +1,5 @@
 // Halloween Words: listen to a word and tap the right Halloween character.
-// Characters and their drawings are in characters.js (window.CHARACTERS).
+// Characters and their drawings are in ../shared/halloween/characters.js (window.CHARACTERS).
 // Uses ../shared/kit.js (window.Kit) for speech, sounds, mute, progress and celebrations.
 (function () {
   "use strict";

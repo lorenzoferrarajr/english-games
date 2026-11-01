@@ -6,6 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <title>English Games</title>
+  <script src="shared/settings.js"></script>
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
@@ -17,6 +18,7 @@
       color: #3b3a5c;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       text-align: center;
+      text-transform: uppercase;
       touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
@@ -24,6 +26,7 @@
       -webkit-tap-highlight-color: transparent;
       overscroll-behavior: none;
     }
+    html[data-letter-case="lower"] body { text-transform: lowercase; }
     h1 { margin: 0 0 32px; font-size: clamp(36px, 7vmin, 64px); }
     .games {
       display: grid;
@@ -49,6 +52,51 @@
     .icon { font-size: 80px; line-height: 1; }
     .name { font-size: 30px; font-weight: bold; }
     .what { font-size: 20px; opacity: 0.7; }
+
+    /* ---------- Settings ---------- */
+    .settings {
+      max-width: 1000px;
+      margin: 40px auto 0;
+      padding: 20px 16px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.55);
+    }
+    .settings h2 { margin: 0 0 16px; font-size: 26px; }
+    .setting {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 24px;
+    }
+    .choice {
+      display: flex;
+      gap: 8px;
+      padding: 6px;
+      border-radius: 22px;
+      background: rgba(59, 58, 92, 0.1);
+    }
+    .choice button {
+      min-width: 110px;
+      height: 64px;
+      border: 4px solid transparent;
+      border-radius: 18px;
+      background: transparent;
+      color: inherit;
+      font-family: inherit;
+      font-size: 32px;
+      font-weight: bold;
+      text-transform: none; /* show "ABC" and "abc" exactly as written */
+      cursor: pointer;
+      transition: transform 0.08s;
+    }
+    .choice button:active { transform: scale(0.95); }
+    .choice button[aria-pressed="true"] {
+      background: #fff;
+      border-color: #ff8a3d;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -69,6 +117,40 @@
       <span class="name">Halloween</span>
       <span class="what">ghost, bat, witch…</span>
     </a>
+    <a class="game" href="halloween-memory/index.html">
+      <span class="icon" aria-hidden="true">🦇</span>
+      <span class="name">Halloween Memory</span>
+      <span class="what">find the hidden cards</span>
+    </a>
   </nav>
+
+  <!-- Settings for all games (saved in this browser) -->
+  <section class="settings" aria-labelledby="settings-title">
+    <h2 id="settings-title">⚙️ Settings</h2>
+    <div class="setting">
+      <span id="case-label">Letters</span>
+      <div class="choice" role="group" aria-labelledby="case-label">
+        <button type="button" data-case="upper" aria-label="Uppercase letters">ABC</button>
+        <button type="button" data-case="lower" aria-label="Lowercase letters">abc</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      "use strict";
+      const buttons = document.querySelectorAll(".choice button[data-case]");
+      function render() {
+        const current = Settings.getLetterCase();
+        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.case === current)));
+      }
+      buttons.forEach((b) => b.addEventListener("click", () => {
+        Settings.setLetterCase(b.dataset.case);
+        render();
+      }));
+      window.addEventListener("pageshow", render);
+      render();
+    })();
+  </script>
 </body>
 </html>

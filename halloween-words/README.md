@@ -13,4 +13,4 @@ A listening game: a voice says a Halloween word and the child taps the matching 
 3. Each round asks every word twice (16 questions), in random order, never the same word twice in a row.
    The characters change places after every question, so the child has to listen, not remember positions.
 
-The characters are drawn as SVG in `characters.js` (friendly, not scary). Words are spoken with the browser's speech synthesis (British English voice when available).
+The characters are drawn as SVG in `../shared/halloween/characters.js` (friendly, not scary). Words are spoken with the browser's speech synthesis (British English voice when available).

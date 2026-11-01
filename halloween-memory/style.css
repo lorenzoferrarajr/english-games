@@ -1,0 +1,146 @@
+/* Halloween Memory: game-specific styles
+   (shared look: ../shared/base.css, Halloween theme: ../shared/halloween/theme.css) */
+
+/* Before playing, show the title and Play button; while playing, show the listen prompt.
+   The Play button keeps its space while hidden, so the cards don't move. */
+body[data-screen="start"] .game-only {
+  display: none;
+}
+
+body[data-screen="game"] .title.start-only {
+  display: none;
+}
+
+body[data-screen="game"] #play {
+  visibility: hidden;
+  animation: none;
+}
+
+.head {
+  min-height: clamp(90px, 15vmin, 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Cards ---------- */
+
+.mems {
+  --size: clamp(100px, 18vmin, 170px);
+  display: grid;
+  grid-template-columns: repeat(4, var(--size));
+  gap: clamp(12px, 2.6vmin, 26px);
+}
+
+.mem {
+  position: relative;
+  width: var(--size);
+  height: calc(var(--size) * 1.2);
+  padding: 0;
+  background: none;
+  perspective: 900px;
+  -webkit-perspective: 900px;
+}
+
+.mem.moving {
+  z-index: 2;
+}
+
+.mem-inner {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.45s ease-in-out;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+.mem.down .mem-inner {
+  transform: rotateY(180deg);
+}
+
+.mem-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px;
+  border: 4px solid transparent;
+  border-radius: 24px;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.mem-front {
+  background: linear-gradient(180deg, var(--card-light), var(--card));
+}
+
+.mem-front svg {
+  width: 82%;
+  height: auto;
+  aspect-ratio: 1;
+  overflow: visible;
+}
+
+.mem-word {
+  font-size: calc(var(--size) * 0.15); /* sized to the card so SKELETON fits in capitals */
+  line-height: 1.1;
+}
+
+.mem-back {
+  transform: rotateY(180deg);
+  border-color: #ff8c1a;
+  background:
+    radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.18) 0 3px, transparent 4px),
+    radial-gradient(circle at 75% 80%, rgba(255, 255, 255, 0.18) 0 3px, transparent 4px),
+    radial-gradient(circle at 80% 25%, rgba(255, 255, 255, 0.12) 0 2px, transparent 3px),
+    linear-gradient(160deg, #3b2766, #241845);
+}
+
+.mem-q {
+  font-size: calc(var(--size) * 0.55);
+  font-weight: bold;
+  line-height: 1;
+  color: #ff8c1a;
+  text-shadow: 0 4px 0 #6b2f00;
+}
+
+/* Pressed state on the outer card. Never put filter/opacity on .mem-inner: they force
+   the 3D flip to render flat, and the hidden picture flashes through (mirrored). */
+.mem {
+  transition: transform 0.1s;
+}
+
+.mem:active {
+  transform: scale(0.95);
+}
+
+.mem.cheer .mem-front {
+  animation: happy 0.8s ease-in-out;
+}
+
+.mem.right .mem-front {
+  border-color: var(--hint);
+  animation: happy 0.8s ease-in-out;
+}
+
+.mem.wrong .mem-front {
+  animation: wobble 0.45s ease-in-out;
+}
+
+
+/* Found cards disappear but keep their place, so the other cards don't move */
+.mem.gone {
+  animation: vanish 0.5s ease-in forwards;
+  pointer-events: none;
+}
+
+/* ---------- Animations ---------- */
+
+@keyframes vanish {
+  to { opacity: 0; transform: scale(0.3) rotate(12deg); }
+}
+
