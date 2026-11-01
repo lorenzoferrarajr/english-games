@@ -125,13 +125,13 @@
       els.objects.appendChild(obj);
     }
 
-    // Empty slots showing faint "ghost" letters to copy
+    // One empty box per letter: the child spells the word from memory
     els.slots.innerHTML = "";
     els.slots.classList.remove("done");
     item.word.split("").forEach((letter) => {
       const slot = document.createElement("span");
       slot.className = "slot";
-      slot.textContent = letter;
+      slot.dataset.letter = letter;
       els.slots.appendChild(slot);
     });
 
@@ -205,6 +205,7 @@
       tile.classList.add("used");
       tile.disabled = true;
       const slot = els.slots.children[state.filled];
+      slot.textContent = slot.dataset.letter;
       slot.classList.add("filled");
       Kit.replayClass(slot, "bounce");
       state.filled++;

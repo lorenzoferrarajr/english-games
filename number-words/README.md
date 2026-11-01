@@ -8,7 +8,7 @@ Teaches how the numbers 1 to 10 are written (and said) in English.
 
 1. **Learn:** the first screen shows the numbers 1–10 with their words. Tap a card to hear it.
 2. **Play (▶):** a number appears with that many things to count, and the word is spoken.
-   Tap the letter tiles in the right order to build the word. Faint letters in the boxes show what to copy.
+   Tap the letter tiles in the right order to build the word. The boxes start empty (one box per letter), so the child spells the word from memory.
    - Tap the big number to hear the word again.
    - A wrong tile just wobbles; after two wrong tries (or a pause) the right tile glows.
 3. Each round covers all 10 numbers in random order, and ends with a celebration. Press ▶ to play again, or **1 2 3** to go back to the cards.
