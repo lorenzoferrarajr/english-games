@@ -17,6 +17,20 @@
     <button id="mute" class="icon-btn" type="button" aria-label="Mute" aria-pressed="false">🔊</button>
   </header>
 
+  <!-- Information panel (shown by the ℹ️ button; see setupInfo in ../shared/kit.js) -->
+  <template id="game-info">
+    <h2>Count and Match</h2>
+    <p>Learn how the numbers 1 to 10 are written in English, by counting.</p>
+    <h3>How to play</h3>
+    <ol>
+      <li>Number words are on the left, cards with things to count are on the right.</li>
+      <li>Connect each word to the card with that many things: draw a line with your finger, or tap one card and then the other.</li>
+      <li>Tap a word to hear it. Tap a card to see its things hop, one by one.</li>
+      <li>A wrong match just wobbles. After two wrong tries, or a pause, the right pair glows.</li>
+      <li>Every round has all ten numbers, on two boards of five.</li>
+    </ol>
+  </template>
+
   <main>
     <!-- Start screen: a small animated example of a connection -->
     <section id="screen-start" class="screen active">

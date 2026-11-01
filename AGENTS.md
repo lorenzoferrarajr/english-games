@@ -34,6 +34,7 @@ Rules:
 - Games are independent: no game imports files from another game's folder. Common code lives in `shared/` and is loaded with relative paths (`../shared/base.css` before the game's `style.css`, `../shared/kit.js` before the game's `game.js`).
 - Every page loads `../shared/settings.js` in `<head>`, before the stylesheets, so settings chosen on the index page (like letter case) apply to it.
 - All text is shown in UPPERCASE or lowercase depending on that setting (CSS `text-transform` in `shared/base.css`). Write words in lowercase in the code, never hard-code capitals for case, and make sure the longest word fits in capitals.
+- Optional information panel: a game can add `<template id="game-info">…</template>` to its `index.html` (rules, what it teaches, who invented it, …). `Kit` then adds an ℹ️ button to the top bar that shows it; speech and sounds pause while it is open. No template, no button. Keep it short, written for grown-ups, and in sync with the game's `README.md`.
 - Use `Kit` for speech, sound effects, mute, screens, progress and celebrations instead of re-implementing them, so all games look, sound and behave the same. Only add to `shared/` what at least two games need, and when changing it, re-test every game.
 - When adding a game, add a link to it in the root `index.html` launcher (create it if missing).
 
@@ -145,3 +146,4 @@ There is no automated test suite. Before considering a game done:
 - [ ] Gentle feedback, end-of-round celebration, "Play again"
 - [ ] Linked from the root `index.html`
 - [ ] Short `README.md` in the game folder: what it teaches, the word list, how to play
+- [ ] Optional: `<template id="game-info">` with the rules, shown by the ℹ️ button

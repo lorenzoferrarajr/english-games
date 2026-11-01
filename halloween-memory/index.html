@@ -24,6 +24,23 @@
     <button id="mute" class="icon-btn" type="button" aria-label="Mute" aria-pressed="false">🔊</button>
   </header>
 
+  <!-- Information panel (shown by the ℹ️ button; see setupInfo in ../shared/kit.js) -->
+  <template id="game-info">
+    <h2>Halloween Memory</h2>
+    <p>Listen, remember and find the hidden Halloween cards.</p>
+    <h3>How to play</h3>
+    <ol>
+      <li>Look at the cards and tap them to hear their names.</li>
+      <li>Press ▶. The cards turn over and some of them swap places.</li>
+      <li>The voice says a word: tap the card you think it is.</li>
+      <li>The right card disappears. A wrong card shows itself, says its name and turns back over.</li>
+      <li>Every turn asks for a different card. There are no hints: use your memory!</li>
+      <li>The round ends when all the cards are found.</li>
+    </ol>
+    <h3>Who invented it</h3>
+    <p>This game was invented by Flora, 6 years old, from Italy. 🇮🇹</p>
+  </template>
+
   <main>
     <!-- The board is used both before playing (cards face up) and while playing (cards face down) -->
     <section id="screen-board" class="screen active">

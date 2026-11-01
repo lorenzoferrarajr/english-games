@@ -1,6 +1,6 @@
 # Halloween Memory
 
-A listening and memory game with the Halloween characters.
+A listening and memory game with the Halloween characters, invented by Flora, 6 years old, from Italy.
 
 **Words:** ghost, bat, pumpkin, witch, cat, skeleton, monster, spider
 

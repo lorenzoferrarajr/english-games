@@ -6,6 +6,11 @@ window.Kit = (function () {
 
   const MUTE_KEY = "english-games.muted";
   let muted = false;
+  let infoOpen = false; // the game's information panel is showing: stay quiet
+
+  function quiet() {
+    return muted || infoOpen;
+  }
 
   // ---------- Small helpers ----------
   function shuffle(list) {
@@ -94,7 +99,7 @@ window.Kit = (function () {
 
   // Speak one or more phrases in order, interrupting anything already playing.
   function speak(...phrases) {
-    if (!synth || muted) return;
+    if (!synth || quiet()) return;
     hasSpoken = true;
     const run = () => {
       phrases.forEach((text) => {
@@ -120,7 +125,7 @@ window.Kit = (function () {
   let audioCtx = null;
 
   function tone(freq, at, dur, type, vol) {
-    if (!audioCtx || muted) return;
+    if (!audioCtx || quiet()) return;
     const t0 = audioCtx.currentTime + at;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -207,6 +212,58 @@ window.Kit = (function () {
     button.addEventListener("click", () => setMuted(!muted));
   }
 
+  // ---------- Information panel (optional, per game) ----------
+  // If the page has <template id="game-info"> (rules, who invented the game, ...),
+  // add an ℹ️ button to the top bar that shows it in a panel. Without the template,
+  // nothing is added. While the panel is open, speech and sounds are paused.
+  function setupInfo() {
+    const tpl = document.getElementById("game-info");
+    const topbar = document.querySelector(".topbar");
+    const mute = document.getElementById("mute");
+    if (!tpl || !topbar || !mute) return;
+
+    // Group the ℹ️ and mute buttons on the right of the top bar
+    const right = document.createElement("div");
+    right.className = "topbar-right";
+    mute.replaceWith(right);
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "icon-btn";
+    button.id = "info";
+    button.textContent = "ℹ️";
+    button.setAttribute("aria-label", "About this game");
+    right.append(button, mute);
+
+    const dialog = document.createElement("dialog");
+    dialog.className = "info-panel";
+    dialog.setAttribute("aria-label", "About this game");
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "info-close";
+    close.textContent = "✕";
+    close.setAttribute("aria-label", "Close");
+    const body = document.createElement("div");
+    body.className = "info-body";
+    body.appendChild(tpl.content.cloneNode(true));
+    dialog.append(close, body);
+    document.body.appendChild(dialog);
+
+    button.addEventListener("click", () => {
+      infoOpen = true;
+      if (synth) synth.cancel();
+      if (dialog.showModal) dialog.showModal();
+      else dialog.setAttribute("open", "");
+    });
+    close.addEventListener("click", () => dialog.close ? dialog.close() : dialog.removeAttribute("open"));
+    // Tapping the dark area around the panel also closes it
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener("close", () => {
+      infoOpen = false;
+    });
+  }
+
   // ---------- Screens ----------
   // Shows <section id="screen-NAME" class="screen"> and sets body[data-screen].
   function show(name) {
@@ -252,6 +309,8 @@ window.Kit = (function () {
       setTimeout(() => s.remove(), 2200);
     }
   }
+
+  setupInfo(); // kit.js is loaded at the end of <body>, so the page is ready
 
   return {
     shuffle,

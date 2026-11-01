@@ -24,6 +24,20 @@
     <button id="mute" class="icon-btn" type="button" aria-label="Mute" aria-pressed="false">🔊</button>
   </header>
 
+  <!-- Information panel (shown by the ℹ️ button; see setupInfo in ../shared/kit.js) -->
+  <template id="game-info">
+    <h2>Halloween</h2>
+    <p>Listen and find: learn eight Halloween words.</p>
+    <h3>How to play</h3>
+    <ol>
+      <li>Tap the pictures to hear their names.</li>
+      <li>Press ▶. The voice says a word: tap the right picture. Tap the orange 🔊 button to hear it again.</li>
+      <li>A wrong picture just wobbles. After two wrong taps, or a pause, the right picture glows.</li>
+      <li>The pictures change places after every question, so listen carefully!</li>
+      <li>Every word is asked twice in a round.</li>
+    </ol>
+  </template>
+
   <main>
     <!-- Learn screen: tap a character to hear its name -->
     <section id="screen-start" class="screen active">

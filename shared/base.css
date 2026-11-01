@@ -90,6 +90,11 @@ button {
   gap: 8px;
 }
 
+.topbar-right {
+  display: flex;
+  gap: 12px;
+}
+
 body:not([data-screen="game"]) .progress {
   visibility: hidden;
 }
@@ -211,6 +216,75 @@ main {
   display: flex;
   align-items: center;
   gap: 32px;
+}
+
+/* ---------- Information panel (see setupInfo in kit.js) ---------- */
+
+.info-panel {
+  width: min(680px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 0;
+  border-radius: 28px;
+  background: #fffaf0;
+  color: #3b3a5c;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.info-panel[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-panel::backdrop {
+  background: rgba(20, 14, 50, 0.6);
+}
+
+.info-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #ece6f5;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.info-close:active {
+  transform: scale(0.94);
+}
+
+.info-body {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding: 24px 32px 28px;
+  font-size: 20px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.info-body h2 {
+  margin: 0 64px 12px 0;
+  font-size: 30px;
+}
+
+.info-body h3 {
+  margin: 22px 0 8px;
+  font-size: 22px;
+}
+
+.info-body p,
+.info-body ul,
+.info-body ol {
+  margin: 0 0 10px;
+}
+
+.info-body li {
+  margin-bottom: 6px;
 }
 
 /* ---------- Celebration ---------- */

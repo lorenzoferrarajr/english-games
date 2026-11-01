@@ -17,6 +17,20 @@
     <button id="mute" class="icon-btn" type="button" aria-label="Mute" aria-pressed="false">🔊</button>
   </header>
 
+  <!-- Information panel (shown by the ℹ️ button; see setupInfo in ../shared/kit.js) -->
+  <template id="game-info">
+    <h2>Number Words</h2>
+    <p>Learn how the numbers 1 to 10 are written in English.</p>
+    <h3>How to play</h3>
+    <ol>
+      <li>Tap the number cards to hear each number.</li>
+      <li>Press ▶. A number appears with that many things to count, and the voice says it.</li>
+      <li>Tap the letters in the right order to write the word. Tap the big number to hear it again.</li>
+      <li>A wrong letter just wobbles. After two wrong taps, or a pause, the right letter glows.</li>
+      <li>Every round has all ten numbers, in a random order.</li>
+    </ol>
+  </template>
+
   <main>
     <!-- Learn screen: tap a card to hear the number, then press play -->
     <section id="screen-start" class="screen active">
