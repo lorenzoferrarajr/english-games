@@ -156,5 +156,30 @@ window.CHARACTERS = (function () {
         <path d="M35 66 Q50 82 65 66 Z" fill="${DARK}"/>
         <path d="M40 67 L43 72 L46 67.5 Z M54 67.5 L57 72 L60 67 Z" fill="#fff"/>`),
     },
+    {
+      word: "spider",
+      svg: svg(`
+        <line x1="50" y1="0" x2="50" y2="46" stroke="#d6cff2" stroke-width="1.5"/>
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <g stroke="${OUTLINE}" stroke-width="7">
+            <path d="M38 54 Q24 38 13 47 M37 60 Q21 54 9 63 M38 66 Q23 70 14 82 M41 72 Q31 82 26 93"/>
+            <path d="M62 54 Q76 38 87 47 M63 60 Q79 54 91 63 M62 66 Q77 70 86 82 M59 72 Q69 82 74 93"/>
+          </g>
+          <g stroke="#2a1f45" stroke-width="4">
+            <path d="M38 54 Q24 38 13 47 M37 60 Q21 54 9 63 M38 66 Q23 70 14 82 M41 72 Q31 82 26 93"/>
+            <path d="M62 54 Q76 38 87 47 M63 60 Q79 54 91 63 M62 66 Q77 70 86 82 M59 72 Q69 82 74 93"/>
+          </g>
+        </g>
+        <circle cx="50" cy="62" r="17" fill="#2a1f45" stroke="${OUTLINE}" stroke-width="2"/>
+        <circle cx="43.5" cy="58" r="6" fill="#fff"/>
+        <circle cx="56.5" cy="58" r="6" fill="#fff"/>
+        <circle cx="44.5" cy="59" r="2.8" fill="${DARK}"/>
+        <circle cx="55.5" cy="59" r="2.8" fill="${DARK}"/>
+        <circle cx="45.5" cy="57.8" r="1" fill="#fff"/>
+        <circle cx="56.5" cy="57.8" r="1" fill="#fff"/>
+        <circle cx="38" cy="67" r="3" fill="#ffb8cc" opacity="0.8"/>
+        <circle cx="62" cy="67" r="3" fill="#ffb8cc" opacity="0.8"/>
+        <path d="M44 68 Q50 74 56 68" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`),
+    },
   ];
 })();

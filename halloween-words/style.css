@@ -57,7 +57,7 @@ main {
   background: #1c1238;
 }
 
-/* Fit the shared progress bar to 14 questions */
+/* Fit the shared progress bar to 16 questions */
 .dot {
   width: 30px;
   height: 30px;
@@ -221,4 +221,10 @@ main {
 @keyframes char-glow {
   0%, 100% { box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 0 0 0 var(--hint); }
   50% { box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 0 0 10px var(--hint); }
+}
+
+/* 16 stars on the end screen: keep them on one line */
+.end-stars {
+  font-size: clamp(24px, 4.4vmin, 44px);
+  letter-spacing: 2px;
 }

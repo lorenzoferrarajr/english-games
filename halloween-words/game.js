@@ -5,7 +5,7 @@
   "use strict";
 
   const CHARACTERS = window.CHARACTERS;
-  const TIMES_EACH = 2; // every word is asked twice per round (7 x 2 = 14 questions)
+  const TIMES_EACH = 2; // every word is asked twice per round (8 x 2 = 16 questions)
   const FIRST_HINT_MS = 5000; // idle time before repeating the word on the first question
   const HINT_MS = 7000; // idle time before repeating the word afterwards
   const NEXT_MS = 2200; // pause after a right answer
