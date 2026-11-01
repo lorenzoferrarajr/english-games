@@ -75,38 +75,82 @@ window.Kit = (function () {
     "Microsoft Hazel",
     "Microsoft George",
   ];
-  let voice = null;
+  const NORMAL_RATE = 0.8; // used when shared/settings.js isn't loaded
 
-  function pickVoice() {
-    if (!synth) return;
-    const voices = synth.getVoices().filter((v) =>
-      (v.lang || "").replace("_", "-").toLowerCase().startsWith("en-gb")
-    );
-    voice = null;
+  function britishVoices() {
+    if (window.Settings) return Settings.britishVoices();
+    if (!synth) return [];
+    return synth.getVoices().filter((v) => (v.lang || "").replace("_", "-").toLowerCase() === "en-gb");
+  }
+
+  // "Default" voice: a known good British voice by name, or null = let the device
+  // choose its own voice for LANG.
+  function defaultVoice(voices) {
     for (const name of GOOD_VOICES) {
-      voice = voices.find((v) => v.name === name || v.name.startsWith(name + " ")) || null;
-      if (voice) break;
+      const v = voices.find((x) => x.name === name || x.name.startsWith(name + " "));
+      if (v) return v;
     }
+    return null;
   }
 
-  if (synth) {
-    pickVoice();
-    if (synth.addEventListener) synth.addEventListener("voiceschanged", pickVoice);
-    else synth.onvoiceschanged = pickVoice;
+  // The voice to use: the one asked for (or saved on the games page) if this device
+  // has it, otherwise Default. Looked up every time, so new settings apply at once
+  // and a voice missing on this device (other tablet, system update) is never used.
+  function chooseVoice(voiceURI) {
+    const voices = britishVoices();
+    const wanted = voiceURI !== undefined ? voiceURI : window.Settings ? Settings.getVoice() : "";
+    return (wanted && voices.find((v) => v.voiceURI === wanted)) || defaultVoice(voices);
   }
+
+  // Some browsers only list voices after "voiceschanged"; asking once makes them load.
+  if (synth) synth.getVoices();
 
   let hasSpoken = false; // has speak() been called at least once?
 
+  // A short "space" before each word. Tablets put their audio output to sleep after
+  // some silence, and the first part of a word can be lost while it wakes up. So we
+  // first wake the output with an inaudible signal, then start speaking a moment later.
+  const LEAD_MS = 150;
+
+  function wakeOutput() {
+    if (!audioCtx || audioCtx.state !== "running") return;
+    const t0 = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = 20; // below what tablet speakers can play
+    gain.gain.value = 0.001; // and far too quiet to hear anyway
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t0);
+    osc.stop(t0 + LEAD_MS / 1000 + 0.6); // keep it awake while the word starts
+  }
+
+  let pendingSpeech = 0; // timer of a word waiting for its "space"
+
   // Speak one or more phrases in order, interrupting anything already playing.
+  // Uses the voice and speed saved on the games page.
   function speak(...phrases) {
+    speakWith({}, ...phrases);
+  }
+
+  // Like speak(), with options: { voice: voiceURI ("" = Default), speed: "slow" | "normal" | "fast" }.
+  // Used by the ▶ sample buttons on the games page.
+  function speakWith(options, ...phrases) {
     if (!synth || quiet()) return;
+    clearTimeout(pendingSpeech); // a newer request replaces one still waiting
+    // The very first speech must start inside the tap (iOS rule), so no delay then.
+    const lead = hasSpoken ? LEAD_MS : 0;
     hasSpoken = true;
+    if (lead) wakeOutput();
     const run = () => {
+      if (quiet()) return; // muted or info panel opened while waiting
+      const voice = chooseVoice(options.voice);
+      const rate = window.Settings ? Settings.getRate(options.speed) : NORMAL_RATE;
       phrases.forEach((text) => {
         const u = new SpeechSynthesisUtterance(text);
         u.lang = LANG;
         if (voice) u.voice = voice;
-        u.rate = 0.8;
+        u.rate = rate;
         u.pitch = 1.1;
         synth.speak(u);
       });
@@ -115,7 +159,9 @@ window.Kit = (function () {
     if (synth.speaking || synth.pending) {
       // Safari drops an utterance queued right after cancel(), so wait a moment.
       synth.cancel();
-      setTimeout(run, 80);
+      pendingSpeech = setTimeout(run, Math.max(80, lead));
+    } else if (lead) {
+      pendingSpeech = setTimeout(run, lead);
     } else {
       run();
     }
@@ -320,17 +366,24 @@ window.Kit = (function () {
     load,
     save,
     speak,
+    speakWith,
     sfx,
     setupMute,
     show,
     renderProgress,
     celebrate,
+    // for the games page: which voice "Default" means on this device (null = device's own)
+    defaultVoice: () => defaultVoice(britishVoices()),
     // for shared/audio-check.html
-    debugInfo: () => ({
-      voice: voice ? voice.name + " (" + voice.lang + ")" : "device default for " + LANG,
-      sounds: audioCtx ? audioCtx.state : "not started yet",
-      muted,
-    }),
+    debugInfo: () => {
+      const voice = chooseVoice();
+      return {
+        voice: voice ? voice.name + " (" + voice.lang + ")" : "device default for " + LANG,
+        speed: window.Settings ? Settings.getSpeed() + " (" + Settings.getRate() + "×)" : "normal",
+        sounds: audioCtx ? audioCtx.state : "not started yet",
+        muted,
+      };
+    },
     PRAISE: ["Well done!", "Great job!", "Super!", "Brilliant!", "Fantastic!", "Yes!"],
   };
 })();

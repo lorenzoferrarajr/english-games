@@ -18,7 +18,7 @@ english-games/
 ├── shared/
 │   ├── base.css          # Common look: colours, top bar, buttons, end screen, animations, touch CSS
 │   ├── kit.js            # window.Kit: speech, sound effects, mute, screens, progress dots, celebrations
-│   ├── settings.js       # window.Settings: options chosen on the index page (e.g. UPPERCASE / lowercase letters)
+│   ├── settings.js       # window.Settings: options chosen on the index page (letters ABC/abc, voice, speech speed)
 │   ├── audio-check.html  # Page to check speech and sounds on a device
 │   └── halloween/        # Shared by the Halloween games: characters.js (words + SVG drawings), theme.css (night sky)
 └── <game-name>/          # kebab-case, e.g. animal-sounds, color-match
@@ -32,7 +32,7 @@ Rules:
 - Folder names are lowercase `kebab-case` and describe the game (`fruit-memory`, `count-the-stars`).
 - Every game folder has an `index.html` entry point.
 - Games are independent: no game imports files from another game's folder. Common code lives in `shared/` and is loaded with relative paths (`../shared/base.css` before the game's `style.css`, `../shared/kit.js` before the game's `game.js`).
-- Every page loads `../shared/settings.js` in `<head>`, before the stylesheets, so settings chosen on the index page (like letter case) apply to it.
+- Every page loads `../shared/settings.js` in `<head>`, before the stylesheets, so settings chosen on the index page (letter case, voice, speed) apply to it. Settings are per device, in `localStorage`.
 - All text is shown in UPPERCASE or lowercase depending on that setting (CSS `text-transform` in `shared/base.css`). Write words in lowercase in the code, never hard-code capitals for case, and make sure the longest word fits in capitals.
 - Optional information panel: a game can add `<template id="game-info">…</template>` to its `index.html` (rules, what it teaches, who invented it, …). `Kit` then adds an ℹ️ button to the top bar that shows it; speech and sounds pause while it is open. No template, no button. Keep it short, written for grown-ups, and in sync with the game's `README.md`.
 - Use `Kit` for speech, sound effects, mute, screens, progress and celebrations instead of re-implementing them, so all games look, sound and behave the same. Only add to `shared/` what at least two games need, and when changing it, re-test every game.
@@ -80,7 +80,9 @@ Rules:
 - All of this is handled by `Kit.speak()` / `Kit.sfx` in `shared/kit.js`; use them rather than calling the APIs directly. Known Safari pitfalls it works around:
   - Don't call `speechSynthesis.cancel()` and then `speak()` straight away: Safari drops the new utterance. Only cancel when something is actually speaking, and speak again after a short delay.
   - Don't pick "the first en-GB voice": iOS lists novelty voices that can sound odd or stay silent. Choose a known voice by name, or only set `utterance.lang` and let the device pick.
+  - Tablets let their audio output fall asleep, cutting the start of words: `Kit.speak()` plays an inaudible 20 Hz signal and starts the word 150 ms later (a "space"). The first word after a tap is spoken immediately, inside the tap (iOS rule).
   - Silent mode mutes web audio on iPad; `navigator.audioSession.type = "playback"` (Safari 17+) lets it play.
+- Voice and speed: chosen in ⚙️ Settings on the games list. `Kit.speak()` reads them every time it speaks, so changes apply at once (also after the Back button). Speeds: slow 0.6×, normal 0.8× (default), fast 1.0×. The voice list shows the device's British English voices (`en-GB`, also `en_GB`). "Default" = a known good British voice by name, otherwise the device's own voice with `lang = "en-GB"`; a saved voice that isn't on the device falls back to Default. Games never pass their own voice or rate; `Kit.speakWith({ voice, speed }, ...)` is only for the ▶ samples in Settings.
 - To check audio on a new device, open `shared/audio-check.html` on it.
 - `speechSynthesis.getVoices()` may be empty at first; listen for `voiceschanged`. Always set `utterance.lang` (e.g. `"en-GB"`).
 - Don't assume a device has a particular voice installed; recorded audio files are the most reliable option when quality matters.
@@ -98,7 +100,7 @@ The players are 6 years old, are still learning to read (in any language), and d
 
 ### Audio
 - **Every word that is taught must be heard.** Use the Web Speech API (`speechSynthesis`) with an `en-GB` or `en-US` voice, or recorded audio files in `assets/audio/`.
-- Speak words slowly (`utterance.rate` around 0.8) and let the child replay them by tapping.
+- Speak words slowly (the default speed is 0.8×; grown-ups can change it in Settings) and let the child replay them by tapping.
 - Browsers block audio until the user interacts, so start with a big "Play" / ▶ button.
 - Provide a clearly visible mute button.
 

@@ -1,5 +1,7 @@
 # English Games
 
+**▶ Play online: https://lorenzoferrarajr.github.io/english-games/**
+
 Simple browser games that help young children (around 6 years old) who are not native English speakers learn their first English words. Every word is spoken aloud, so the games work even before children can read.
 
 The games are made for **touch tablets** (iPad and Android) and also work on a computer. They need no installation, no account and no internet connection once loaded, and they collect no data.
@@ -13,7 +15,13 @@ The games are made for **touch tablets** (iPad and Android) and also work on a c
 | [Halloween](halloween-words/) | Eight Halloween words: listen and tap the right picture |
 | [Halloween Memory](halloween-memory/) | The same words, as a listening and memory game. Invented by Flora, 6 years old, from Italy |
 
-Open `index.html` to see them all. On the games page, **Settings** switches every game between UPPERCASE and lowercase letters. In each game, the ℹ️ button shows the rules.
+Open `index.html` to see them all. In each game, the ℹ️ button shows the rules.
+
+**⚙️ Settings** on the games page apply to every game and are remembered on each device:
+
+- **Letters:** UPPERCASE (ABC) or lowercase (abc).
+- **Speed:** slow, normal or fast speech.
+- **Voice:** any British English voice the device has, or *Default*. Tap ▶ next to a voice to hear a sample. If a saved voice isn't available (another tablet, a system update), the games use Default.
 
 ## Running locally
 

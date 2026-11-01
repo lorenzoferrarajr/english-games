@@ -97,6 +97,61 @@
       border-color: #ff8a3d;
       box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
     }
+    .choice button.follow-case { text-transform: inherit; font-size: 26px; }
+    .setting + .setting { margin-top: 24px; }
+    .setting-label { min-width: 90px; }
+
+    /* Voice list: pick a voice, ▶ to hear a sample */
+    .setting-voice { flex-direction: column; }
+    .voices {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(100%, 640px);
+    }
+    .voice-row { display: flex; gap: 10px; }
+    .voice-pick {
+      flex: 1;
+      min-width: 0;
+      min-height: 64px;
+      padding: 8px 18px;
+      border: 4px solid transparent;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.7);
+      color: inherit;
+      font-family: inherit;
+      font-size: 24px;
+      text-align: left;
+      text-transform: inherit;
+      overflow-wrap: anywhere;
+      cursor: pointer;
+      transition: transform 0.08s;
+    }
+    .voice-pick:active { transform: scale(0.98); }
+    .voice-pick[aria-pressed="true"] {
+      background: #fff;
+      border-color: #ff8a3d;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+    }
+    .voice-name { text-transform: none; } /* exactly as the device reports it */
+    .voice-pick small { display: block; font-size: 17px; opacity: 0.7; }
+    .voice-play {
+      width: 64px;
+      height: 64px;
+      flex: none;
+      align-self: center;
+      border: 0;
+      border-radius: 50%;
+      background: #2fbf68;
+      box-shadow: 0 5px 0 #1f9450;
+      color: #fff;
+      font-size: 28px;
+      padding-left: 5px; /* optically centre the ▶ */
+      cursor: pointer;
+      transition: transform 0.08s;
+    }
+    .voice-play:active { transform: translateY(4px); box-shadow: 0 1px 0 #1f9450; }
+    .note { margin: 4px 0 0; font-size: 18px; opacity: 0.8; }
   </style>
 </head>
 <body>
@@ -128,28 +183,131 @@
   <section class="settings" aria-labelledby="settings-title">
     <h2 id="settings-title">⚙️ Settings</h2>
     <div class="setting">
-      <span id="case-label">Letters</span>
+      <span id="case-label" class="setting-label">Letters</span>
       <div class="choice" role="group" aria-labelledby="case-label">
         <button type="button" data-case="upper" aria-label="Uppercase letters">ABC</button>
         <button type="button" data-case="lower" aria-label="Lowercase letters">abc</button>
       </div>
     </div>
+    <div class="setting">
+      <span id="speed-label" class="setting-label">Speed</span>
+      <div class="choice" role="group" aria-labelledby="speed-label">
+        <button type="button" class="follow-case" data-speed="slow">🐢 slow</button>
+        <button type="button" class="follow-case" data-speed="normal">normal</button>
+        <button type="button" class="follow-case" data-speed="fast">🐇 fast</button>
+      </div>
+    </div>
+    <div class="setting setting-voice">
+      <span id="voice-label" class="setting-label">Voice</span>
+      <div id="voices" class="voices" role="group" aria-labelledby="voice-label"></div>
+      <p id="voice-note" class="note" hidden>The voice chosen before isn't on this device, so Default is used.</p>
+    </div>
   </section>
 
+  <script src="shared/kit.js"></script>
   <script>
     (function () {
       "use strict";
-      const buttons = document.querySelectorAll(".choice button[data-case]");
-      function render() {
+      const SAMPLE = "one, two, three, ghost";
+      const caseButtons = document.querySelectorAll(".choice button[data-case]");
+      const speedButtons = document.querySelectorAll(".choice button[data-speed]");
+      const voiceList = document.getElementById("voices");
+      const voiceNote = document.getElementById("voice-note");
+
+      // ---------- Letters ----------
+      function renderCase() {
         const current = Settings.getLetterCase();
-        buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.case === current)));
+        caseButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.case === current)));
       }
-      buttons.forEach((b) => b.addEventListener("click", () => {
+      caseButtons.forEach((b) => b.addEventListener("click", () => {
         Settings.setLetterCase(b.dataset.case);
-        render();
+        renderCase();
       }));
-      window.addEventListener("pageshow", render);
-      render();
+
+      // ---------- Speed ----------
+      function renderSpeed() {
+        const current = Settings.getSpeed();
+        speedButtons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.speed === current)));
+      }
+      speedButtons.forEach((b) => b.addEventListener("click", () => {
+        Settings.setSpeed(b.dataset.speed);
+        renderSpeed();
+      }));
+
+      // ---------- Voice ----------
+      // One row per British English voice on this device, plus "Default" at the top.
+      function voiceRow(uri, label, detail) {
+        const row = document.createElement("div");
+        row.className = "voice-row";
+
+        const pickBtn = document.createElement("button");
+        pickBtn.type = "button";
+        pickBtn.className = "voice-pick";
+        pickBtn.dataset.voice = uri;
+        pickBtn.append(label);
+        if (detail) {
+          const small = document.createElement("small");
+          small.append(detail);
+          pickBtn.appendChild(small);
+        }
+        pickBtn.addEventListener("click", () => {
+          Settings.setVoice(uri);
+          renderVoices();
+        });
+
+        const playBtn = document.createElement("button");
+        playBtn.type = "button";
+        playBtn.className = "voice-play";
+        playBtn.textContent = "▶";
+        playBtn.setAttribute("aria-label", "Hear " + (uri ? label.textContent : "Default"));
+        playBtn.addEventListener("click", () => {
+          Kit.speakWith({ voice: uri, speed: Settings.getSpeed() }, SAMPLE);
+        });
+
+        row.append(pickBtn, playBtn);
+        return row;
+      }
+
+      function nameSpan(text) {
+        const span = document.createElement("span");
+        span.className = "voice-name";
+        span.textContent = text;
+        return span;
+      }
+
+      function renderVoices() {
+        const voices = Settings.britishVoices();
+        const saved = Settings.getVoice();
+        const savedHere = !saved || voices.some((v) => v.voiceURI === saved);
+        const selected = savedHere ? saved : "";
+
+        voiceList.innerHTML = "";
+        // Default: a known good British voice if there is one, otherwise the device's own
+        const def = Kit.defaultVoice();
+        const defLabel = document.createElement("span");
+        defLabel.textContent = "Default";
+        voiceList.appendChild(voiceRow("", defLabel, def ? nameSpan(def.name) : "This device's own voice"));
+        voices.forEach((v) => voiceList.appendChild(voiceRow(v.voiceURI, nameSpan(v.name), null)));
+
+        voiceList.querySelectorAll(".voice-pick").forEach((b) => {
+          b.setAttribute("aria-pressed", String(b.dataset.voice === selected));
+        });
+        // Only mention the missing voice once the device has listed its voices
+        voiceNote.hidden = savedHere || voices.length === 0;
+      }
+
+      if ("speechSynthesis" in window) {
+        // Some browsers fill in the list a moment after the page opens
+        speechSynthesis.addEventListener("voiceschanged", renderVoices);
+      }
+
+      function renderAll() {
+        renderCase();
+        renderSpeed();
+        renderVoices();
+      }
+      window.addEventListener("pageshow", renderAll);
+      renderAll();
     })();
   </script>
 </body>
