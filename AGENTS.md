@@ -38,6 +38,11 @@ Rules:
 - Use `Kit` for speech, sound effects, mute, screens, progress and celebrations instead of re-implementing them, so all games look, sound and behave the same. Only add to `shared/` what at least two games need, and when changing it, re-test every game.
 - When adding a game, add a link to it in the root `index.html` launcher (create it if missing).
 
+## Licensing
+
+- Code is under the PolyForm Noncommercial License 1.0.0 (`LICENSE.md`); drawings and texts are under CC BY-NC 4.0 (`LICENSE-CONTENT.txt`). See the License section of `README.md`. The author may also release the games commercially.
+- Only add material made for this project. Don't copy in third-party code, drawings, sounds or fonts unless their license clearly allows commercial redistribution, and note the source and license next to it.
+
 ## Technical constraints
 
 - **Plain HTML, CSS and JavaScript only.** No frameworks, no bundlers, no build step, no `npm install`. A game must work by opening its `index.html` in a browser.
