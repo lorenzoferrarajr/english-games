@@ -96,10 +96,16 @@ window.Kit = (function () {
   // The voice to use: the one asked for (or saved on the games page) if this device
   // has it, otherwise Default. Looked up every time, so new settings apply at once
   // and a voice missing on this device (other tablet, system update) is never used.
-  function chooseVoice(voiceURI) {
+  // `wanted` is a voice name (or an older saved voiceURI); "" means Default.
+  function chooseVoice(wanted) {
     const voices = britishVoices();
-    const wanted = voiceURI !== undefined ? voiceURI : window.Settings ? Settings.getVoice() : "";
-    return (wanted && voices.find((v) => v.voiceURI === wanted)) || defaultVoice(voices);
+    if (wanted === undefined) wanted = window.Settings ? Settings.getVoice() : "";
+    const found = !wanted
+      ? null
+      : window.Settings
+      ? Settings.voiceFor(wanted)
+      : voices.find((v) => v.name === wanted || v.voiceURI === wanted);
+    return found || defaultVoice(voices);
   }
 
   // Some browsers only list voices after "voiceschanged"; asking once makes them load.
@@ -133,7 +139,7 @@ window.Kit = (function () {
     speakWith({}, ...phrases);
   }
 
-  // Like speak(), with options: { voice: voiceURI ("" = Default), speed: "slow" | "normal" | "fast" }.
+  // Like speak(), with options: { voice: name ("" = Default), speed: "slow" | "normal" | "fast" }.
   // Used by the ▶ sample buttons on the games page.
   function speakWith(options, ...phrases) {
     if (!synth || quiet()) return;

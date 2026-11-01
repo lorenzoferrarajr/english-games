@@ -88,7 +88,8 @@
           .forEach((v) => {
             const b = document.createElement("button");
             b.type = "button";
-            b.textContent = v.name + " · " + v.lang;
+            // the full list, as the device reports it (duplicates included), with each voice's identifier
+            b.textContent = v.name + " · " + v.lang + " · " + v.voiceURI + (v.localService ? "" : " · online");
             b.addEventListener("click", () => {
               const u = new SpeechSynthesisUtterance("one, two, three, ghost");
               u.voice = v;

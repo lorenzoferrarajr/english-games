@@ -12,7 +12,7 @@ window.Settings = (function () {
   "use strict";
 
   const CASE_KEY = "english-games.letter-case";
-  const VOICE_KEY = "english-games.voice"; // voiceURI of the chosen voice; "" = Default
+  const VOICE_KEY = "english-games.voice"; // name of the chosen voice; "" = Default
   const SPEED_KEY = "english-games.speed";
 
   // Speech rates for the three speed choices ("normal" is the original 0.8)
@@ -54,22 +54,56 @@ window.Settings = (function () {
   }
 
   // ---------- Voice ----------
-  // British English voices on this device (lang "en-GB"; some browsers say "en_GB").
+  // Every British English voice the device reports (lang "en-GB"; some browsers say "en_GB").
   // The list can be empty at first: browsers fill it in later and fire "voiceschanged".
-  function britishVoices() {
+  function allBritishVoices() {
     if (!("speechSynthesis" in window)) return [];
     return window.speechSynthesis
       .getVoices()
       .filter((v) => (v.lang || "").replace("_", "-").toLowerCase() === "en-gb");
   }
 
-  // The saved voice's voiceURI, or "" for Default.
+  // How good a version of a voice is, judging by its voiceURI. Apple devices list the
+  // same voice several times (e.g. "Daniel" as premium, enhanced, compact, super-compact).
+  function quality(v) {
+    const uri = (v.voiceURI || "").toLowerCase();
+    if (uri.includes("premium")) return 5;
+    if (uri.includes("enhanced")) return 4;
+    if (uri.includes("super-compact")) return 1;
+    if (uri.includes("compact")) return 2;
+    return 3;
+  }
+
+  // British English voices to offer: one per name, the best version of each,
+  // in the order the device lists them.
+  function britishVoices() {
+    const best = new Map();
+    allBritishVoices().forEach((v) => {
+      const current = best.get(v.name);
+      if (!current || quality(v) > quality(current)) best.set(v.name, v);
+    });
+    return Array.from(best.values());
+  }
+
+  // The voice for a saved choice, or null if this device doesn't have it.
+  // Voices are saved by name (so "Daniel" means the best Daniel on each device);
+  // a voiceURI saved by an earlier version is still recognised.
+  function voiceFor(saved) {
+    if (!saved) return null;
+    const list = britishVoices();
+    const byName = list.find((v) => v.name === saved);
+    if (byName) return byName;
+    const byURI = allBritishVoices().find((v) => v.voiceURI === saved);
+    return byURI ? list.find((v) => v.name === byURI.name) || null : null;
+  }
+
+  // The saved voice ("" = Default).
   function getVoice() {
     return read(VOICE_KEY) || "";
   }
 
-  function setVoice(voiceURI) {
-    write(VOICE_KEY, voiceURI || "");
+  function setVoice(name) {
+    write(VOICE_KEY, name || "");
   }
 
   // ---------- Speed ----------
@@ -94,6 +128,7 @@ window.Settings = (function () {
     getLetterCase,
     setLetterCase,
     britishVoices,
+    voiceFor,
     getVoice,
     setVoice,
     getSpeed,

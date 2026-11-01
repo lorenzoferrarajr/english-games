@@ -53,15 +53,57 @@
     .name { font-size: 30px; font-weight: bold; }
     .what { font-size: 20px; opacity: 0.7; }
 
-    /* ---------- Settings ---------- */
-    .settings {
-      max-width: 1000px;
-      margin: 40px auto 0;
-      padding: 20px 16px;
-      border-radius: 28px;
-      background: rgba(255, 255, 255, 0.55);
+    /* ---------- Settings: ⚙️ button and panel ---------- */
+    h1 { padding: 0 80px; } /* keep the title clear of the ⚙️ button */
+    .settings-btn {
+      position: absolute;
+      top: calc(16px + env(safe-area-inset-top));
+      right: calc(16px + env(safe-area-inset-right));
+      width: 64px;
+      height: 64px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+      font-size: 32px;
+      cursor: pointer;
+      transition: transform 0.08s;
     }
-    .settings h2 { margin: 0 0 16px; font-size: 26px; }
+    .settings-btn:active { transform: translateY(3px) scale(0.95); }
+    .settings {
+      position: relative;
+      width: min(760px, calc(100vw - 32px));
+      max-height: calc(100dvh - 48px);
+      padding: 24px 20px 28px;
+      border: 0;
+      border-radius: 28px;
+      background: #fffaf0;
+      color: inherit;
+      text-transform: inherit;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    .settings::backdrop { background: rgba(20, 14, 50, 0.6); }
+    .settings h2 { margin: 4px 64px 20px; font-size: 30px; }
+    .settings-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 56px;
+      height: 56px;
+      border: 0;
+      border-radius: 50%;
+      background: #ece6f5;
+      color: inherit;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .settings-close:active { transform: scale(0.94); }
     .setting {
       display: flex;
       flex-wrap: wrap;
@@ -117,7 +159,7 @@
       padding: 8px 18px;
       border: 4px solid transparent;
       border-radius: 18px;
-      background: rgba(255, 255, 255, 0.7);
+      background: #f1ecf7;
       color: inherit;
       font-family: inherit;
       font-size: 24px;
@@ -155,6 +197,7 @@
   </style>
 </head>
 <body>
+  <button id="open-settings" class="settings-btn" type="button" aria-label="Settings" aria-haspopup="dialog">⚙️</button>
   <h1>English Games</h1>
   <nav class="games">
     <a class="game" href="number-words/index.html">
@@ -180,7 +223,8 @@
   </nav>
 
   <!-- Settings for all games (saved in this browser) -->
-  <section class="settings" aria-labelledby="settings-title">
+  <dialog id="settings" class="settings" aria-labelledby="settings-title">
+    <button id="close-settings" class="settings-close" type="button" aria-label="Close">✕</button>
     <h2 id="settings-title">⚙️ Settings</h2>
     <div class="setting">
       <span id="case-label" class="setting-label">Letters</span>
@@ -202,7 +246,7 @@
       <div id="voices" class="voices" role="group" aria-labelledby="voice-label"></div>
       <p id="voice-note" class="note" hidden>The voice chosen before isn't on this device, so Default is used.</p>
     </div>
-  </section>
+  </dialog>
 
   <script src="shared/kit.js"></script>
   <script>
@@ -235,15 +279,16 @@
       }));
 
       // ---------- Voice ----------
-      // One row per British English voice on this device, plus "Default" at the top.
-      function voiceRow(uri, label, detail) {
+      // One row per British English voice name on this device, plus "Default" at the top.
+      // `name` is what gets saved ("" = Default); the games use the best version of it.
+      function voiceRow(name, label, detail) {
         const row = document.createElement("div");
         row.className = "voice-row";
 
         const pickBtn = document.createElement("button");
         pickBtn.type = "button";
         pickBtn.className = "voice-pick";
-        pickBtn.dataset.voice = uri;
+        pickBtn.dataset.voice = name;
         pickBtn.append(label);
         if (detail) {
           const small = document.createElement("small");
@@ -251,7 +296,7 @@
           pickBtn.appendChild(small);
         }
         pickBtn.addEventListener("click", () => {
-          Settings.setVoice(uri);
+          Settings.setVoice(name);
           renderVoices();
         });
 
@@ -259,9 +304,9 @@
         playBtn.type = "button";
         playBtn.className = "voice-play";
         playBtn.textContent = "▶";
-        playBtn.setAttribute("aria-label", "Hear " + (uri ? label.textContent : "Default"));
+        playBtn.setAttribute("aria-label", "Hear " + (name || "Default"));
         playBtn.addEventListener("click", () => {
-          Kit.speakWith({ voice: uri, speed: Settings.getSpeed() }, SAMPLE);
+          Kit.speakWith({ voice: name, speed: Settings.getSpeed() }, SAMPLE);
         });
 
         row.append(pickBtn, playBtn);
@@ -278,8 +323,9 @@
       function renderVoices() {
         const voices = Settings.britishVoices();
         const saved = Settings.getVoice();
-        const savedHere = !saved || voices.some((v) => v.voiceURI === saved);
-        const selected = savedHere ? saved : "";
+        const savedVoice = Settings.voiceFor(saved); // also finds a voice saved by an older version
+        const savedHere = !saved || !!savedVoice;
+        const selected = savedVoice ? savedVoice.name : "";
 
         voiceList.innerHTML = "";
         // Default: a known good British voice if there is one, otherwise the device's own
@@ -287,7 +333,8 @@
         const defLabel = document.createElement("span");
         defLabel.textContent = "Default";
         voiceList.appendChild(voiceRow("", defLabel, def ? nameSpan(def.name) : "This device's own voice"));
-        voices.forEach((v) => voiceList.appendChild(voiceRow(v.voiceURI, nameSpan(v.name), null)));
+        // One row per name (Settings.britishVoices() keeps the best version of each)
+        voices.forEach((v) => voiceList.appendChild(voiceRow(v.name, nameSpan(v.name), null)));
 
         voiceList.querySelectorAll(".voice-pick").forEach((b) => {
           b.setAttribute("aria-pressed", String(b.dataset.voice === selected));
@@ -308,6 +355,27 @@
       }
       window.addEventListener("pageshow", renderAll);
       renderAll();
+
+      // ---------- Opening and closing the panel ----------
+      const panel = document.getElementById("settings");
+      document.getElementById("open-settings").addEventListener("click", () => {
+        renderAll();
+        if (panel.showModal) panel.showModal();
+        else panel.setAttribute("open", "");
+      });
+      function closePanel() {
+        if (panel.close) panel.close();
+        else panel.removeAttribute("open");
+      }
+      document.getElementById("close-settings").addEventListener("click", closePanel);
+      // Tapping the dark area around the panel also closes it. (The panel has its own
+      // padding, so check the tap position rather than just the clicked element.)
+      panel.addEventListener("click", (e) => {
+        if (e.target !== panel) return;
+        const r = panel.getBoundingClientRect();
+        const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+        if (outside) closePanel();
+      });
     })();
   </script>
 </body>

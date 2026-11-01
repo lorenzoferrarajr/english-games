@@ -13,7 +13,7 @@ Each game lives in its own folder at the repository root:
 ```
 english-games/
 ├── AGENTS.md
-├── index.html            # Launcher page linking to every game, plus settings
+├── index.html            # Launcher page linking to every game; ⚙️ button opens Settings
 ├── serve.py              # Local server with caching off, for testing on tablets
 ├── shared/
 │   ├── base.css          # Common look: colours, top bar, buttons, end screen, animations, touch CSS
@@ -82,7 +82,7 @@ Rules:
   - Don't pick "the first en-GB voice": iOS lists novelty voices that can sound odd or stay silent. Choose a known voice by name, or only set `utterance.lang` and let the device pick.
   - Tablets let their audio output fall asleep, cutting the start of words: `Kit.speak()` plays an inaudible 20 Hz signal and starts the word 150 ms later (a "space"). The first word after a tap is spoken immediately, inside the tap (iOS rule).
   - Silent mode mutes web audio on iPad; `navigator.audioSession.type = "playback"` (Safari 17+) lets it play.
-- Voice and speed: chosen in ⚙️ Settings on the games list. `Kit.speak()` reads them every time it speaks, so changes apply at once (also after the Back button). Speeds: slow 0.6×, normal 0.8× (default), fast 1.0×. The voice list shows the device's British English voices (`en-GB`, also `en_GB`). "Default" = a known good British voice by name, otherwise the device's own voice with `lang = "en-GB"`; a saved voice that isn't on the device falls back to Default. Games never pass their own voice or rate; `Kit.speakWith({ voice, speed }, ...)` is only for the ▶ samples in Settings.
+- Voice and speed: chosen in Settings (the ⚙️ button on the games list). `Kit.speak()` reads them every time it speaks, so changes apply at once (also after the Back button). Speeds: slow 0.6×, normal 0.8× (default), fast 1.0×. The voice list shows the device's British English voices (`en-GB`, also `en_GB`), **one per name**: Apple devices list the same voice several times (premium, enhanced, compact, super-compact, sometimes exact duplicates), so `Settings.britishVoices()` keeps the best version of each. Voices are saved **by name** and resolved with `Settings.voiceFor()`, so "Daniel" means the best Daniel on each device. "Default" = a known good British voice by name, otherwise the device's own voice with `lang = "en-GB"`; a saved voice that isn't on the device falls back to Default. Games never pass their own voice or rate; `Kit.speakWith({ voice, speed }, ...)` is only for the ▶ samples in Settings.
 - To check audio on a new device, open `shared/audio-check.html` on it.
 - `speechSynthesis.getVoices()` may be empty at first; listen for `voiceschanged`. Always set `utterance.lang` (e.g. `"en-GB"`).
 - Don't assume a device has a particular voice installed; recorded audio files are the most reliable option when quality matters.

@@ -17,7 +17,7 @@ The games are made for **touch tablets** (iPad and Android) and also work on a c
 
 Open `index.html` to see them all. In each game, the ℹ️ button shows the rules.
 
-**⚙️ Settings** on the games page apply to every game and are remembered on each device:
+The **⚙️** button on the games page opens **Settings**. They apply to every game and are remembered on each device:
 
 - **Letters:** UPPERCASE (ABC) or lowercase (abc).
 - **Speed:** slow, normal or fast speech.
