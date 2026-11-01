@@ -11,7 +11,7 @@
   --go: #2fbf68;
   --go-shadow: #1f9450;
   --hint: #3d9bff;
-  --font: "Chalkboard SE", "Comic Sans MS", "Comic Neue", "Trebuchet MS", system-ui, sans-serif;
+  --font: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 * {
